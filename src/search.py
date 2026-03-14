@@ -1,12 +1,8 @@
 import os
-from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from langchain_postgres import PGVector
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import chain
-
-
-load_dotenv()
 
 PROMPT_TEMPLATE = """
 CONTEXTO:
@@ -35,10 +31,9 @@ PERGUNTA DO USUÁRIO:
 RESPONDA A "PERGUNTA DO USUÁRIO"
 """
 
-@chain
-def search_prompt(input_dict: dict):
-    question = input_dict.get("question")
-
+# Realiza uma busca por similaridade no PGVector usando a pergunta fornecida,
+# retornando os 10 trechos mais relevantes concatenados em uma única string de contexto.
+def get_context(question: str) -> str:
     if not question:
         return "Nenhuma pergunta fornecida."
 
@@ -61,11 +56,24 @@ def search_prompt(input_dict: dict):
     for (result, score) in results:
         contexto += result.page_content.strip() + "\n\n"
 
-    question_template = PromptTemplate(
+    return contexto
+
+# Monta o prompt final combinando o contexto recuperado e a pergunta do usuário,
+# utilizando o template definido para garantir respostas baseadas apenas no contexto.
+@chain
+def search_prompt(input_dict: dict):
+    question = input_dict.get("question")
+    context = input_dict.get("context")
+
+    if not question:
+        return "Nenhuma pergunta fornecida."
+    
+    if not context:
+        return "Nenhum contexto fornecido."
+
+    prompt = PromptTemplate(
         input_variables=["contexto", "pergunta"],
         template=PROMPT_TEMPLATE
     )
 
-    prompt = question_template.invoke({"contexto": contexto, "pergunta": question})
-    
-    return prompt
+    return prompt.invoke({"contexto": context, "pergunta": question})

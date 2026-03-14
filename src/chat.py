@@ -1,4 +1,4 @@
-from search import search_prompt
+from search import search_prompt, get_context
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
@@ -8,19 +8,24 @@ def main():
     
     question = input("Faça sua pergunta: \n\nPERGUNTA: ")
 
-    prompt = search_prompt.invoke({"question": question})
+    if not question:
+        print("Nenhuma pergunta fornecida. Encerrando.")
+        return
+
+    context = get_context(question)
 
     model = ChatOpenAI(model="gpt-5-mini", temperature=0.1)
 
-    response = model.invoke(prompt)
+    chain = search_prompt | model
 
-    print("RESPOSTA: ", response.content)
-
-    # if not chain:
-    #     print("Não foi possível iniciar o chat. Verifique os erros de inicialização.")
-    #     return
+    if not chain:
+        print("Não foi possível iniciar o chat. Verifique os erros de inicialização.")
+        return
     
-    pass
+    response = chain.invoke({"question": question, "context": context})
+    
+    print("RESPOSTA: ", response.content)
+    
 
 if __name__ == "__main__":
     main()
