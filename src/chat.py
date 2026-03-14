@@ -1,4 +1,5 @@
 from search import search_prompt, get_context
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_openai import ChatOpenAI
 from dotenv import load_dotenv
 
@@ -17,6 +18,7 @@ def main():
     context = get_context(question)
 
     model = ChatOpenAI(model="gpt-5-mini", temperature=0.1)
+    #model = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.1)
 
     # Monta o chain combinando o prompt de busca e o modelo de linguagem.
     chain = search_prompt | model

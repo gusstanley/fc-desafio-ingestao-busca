@@ -1,5 +1,6 @@
 import os
 from langchain_openai import OpenAIEmbeddings
+#from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_postgres import PGVector
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import chain
@@ -39,6 +40,7 @@ def get_context(question: str) -> str:
 
     # Embeddings
     embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_MODEL","text-embedding-3-small"))
+    #embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "gemini-embedding-001"))
 
     # Buscar no banco de dados
     vector_store = PGVector(

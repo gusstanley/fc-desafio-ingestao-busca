@@ -3,6 +3,7 @@ from pathlib import Path
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_openai import OpenAIEmbeddings
+#from langchain_google_genai import GoogleGenerativeAIEmbeddings
 from langchain_core.documents import Document
 from langchain_postgres import PGVector
 from dotenv import load_dotenv
@@ -36,6 +37,7 @@ def ingest_pdf():
 
     # Criar embeddings
     embeddings = OpenAIEmbeddings(model=os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small"))
+    #embeddings = GoogleGenerativeAIEmbeddings(model=os.getenv("GOOGLE_EMBEDDING_MODEL", "gemini-embedding-001"))
 
     # Inserir no banco de dados
     vector_store = PGVector(
@@ -50,5 +52,5 @@ def ingest_pdf():
     print("Ingestão concluída com sucesso!")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     ingest_pdf()
